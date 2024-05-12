@@ -2,6 +2,7 @@ package com.jorgonor.locationapi.domain.repository;
 
 import com.jorgonor.locationapi.domain.Location;
 import com.jorgonor.locationapi.domain.LocationId;
+import reactor.core.publisher.Mono;
 
 /**
  * Location repository interface
@@ -9,8 +10,8 @@ import com.jorgonor.locationapi.domain.LocationId;
  * @author jorgonor
  */
 public interface LocationRepository {
-    Location get(LocationId id);
-    Location save(Location location);
-    Location update(LocationId id, Location location);
-    boolean delete(LocationId id);
+    Mono<Location> get(LocationId id);
+    Mono<Location> save(Location location);
+    Mono<Location> update(LocationId id, Location location);
+    Mono<Boolean> delete(LocationId id);
 }
