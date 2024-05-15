@@ -35,8 +35,11 @@ public class LocationMapper {
             .createdAt(locationDTO.getCreatedAt())
             .modifiedAt(locationDTO.getModifiedAt())
             .longitude(locationDTO.getLongitude())
-            .latitude(locationDTO.getLatitude())
-            .tags(locationDTO.getTags());
+            .latitude(locationDTO.getLatitude());
+
+        if (locationDTO.getTags() != null) {
+            locationBuilder.tags(locationDTO.getTags());
+        }
 
         return locationBuilder.build();
     }
