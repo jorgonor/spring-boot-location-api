@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,7 +36,7 @@ public class JdbcLocationRepository implements LocationRepository {
     private static final String QUERY_LOCATION_TAGS_BY_ID = "SELECT tag from location_tag where location_id = :location_id ORDER BY tag";
 
     private static final String QUERY_INSERT_LOCATION = "INSERT INTO location(name, description, created_at, modified_at, latitude, longitude)"
-        + " VALUES (:name, :description, NOW(), NOW(), :latitude, :longitude) RETURNING ID";
+        + " VALUES (:name, :description, NOW(), NOW(), :latitude, :longitude) RETURNING id, created_at, modified_at";
 
     private static final String QUERY_BATCH_INSERT_LOCATION_TAG = "INSERT INTO location_tag(location_id, tag) VALUES(?, ?)";
 
@@ -47,6 +48,7 @@ public class JdbcLocationRepository implements LocationRepository {
     private static final String QUERY_DELETE_LOCATION_TAG_BY_LOCATION_ID = "DELETE FROM location_tag WHERE location_id = :location_id";
     private static final String QUERY_BATCH_DELETE_LOCATION_TAG_BY_LOCATION_ID_AND_TAG = "DELETE FROM location_tag WHERE location_id = ? AND tag = ?";
 
+    private static final String LOCATION_ID_EXPRESSION = "location_id";
 
     @Override
     @Transactional(readOnly = true)
@@ -72,22 +74,28 @@ public class JdbcLocationRepository implements LocationRepository {
     public Location save(Location location) {
         MapSqlParameterSource mapSqlParameterSource = createLocationMapSqlParameterSource(location);
 
-        DataHolder<Long> dataHolder = new DataHolder<>();
+        Location.LocationBuilder locationBuilder = location.toBuilder();
+
+        DataHolder<Long> locationIdDataHolder = new DataHolder<>();
 
         namedParameterJdbcTemplate.query(QUERY_INSERT_LOCATION, mapSqlParameterSource, rs -> {
-            Long locationId = rs.getLong(1);
-            dataHolder.setValue(locationId);
+            long locationIdValue = rs.getLong("id");
+            Instant createdAt = JdbcUtils.getInstantFromColumnLabel(rs, "created_at");
+            Instant modifiedAt = JdbcUtils.getInstantFromColumnLabel(rs, "modified_at");
+
+            locationIdDataHolder.setValue(locationIdValue);
+            LocationId locationId = new LocationId(locationIdValue);
+
+            locationBuilder.id(locationId)
+                .createdAt(createdAt)
+                .modifiedAt(modifiedAt);
         });
 
         if (location.getTags() != null && !location.getTags().isEmpty()) {
-            batchInsertTags(dataHolder.getValue(), location.getTags());
+            batchInsertTags(locationIdDataHolder.getValue(), location.getTags());
         }
 
-        LocationId locationId = new LocationId(dataHolder.getValue());
-
-        return location.toBuilder()
-            .id(locationId)
-            .build();
+        return locationBuilder.build();
     }
 
 
@@ -96,11 +104,11 @@ public class JdbcLocationRepository implements LocationRepository {
     public Location update(LocationId id, Location location) {
         DataHolder<Boolean> dataHolder = new DataHolder<>(Boolean.FALSE);
 
-        namedParameterJdbcTemplate.query(QUERY_EXISTS_LOCATION, Map.of("id", id.getId()), rs -> {
-            dataHolder.setValue(Boolean.TRUE);
-        });
+        namedParameterJdbcTemplate.query(QUERY_EXISTS_LOCATION, Map.of("id", id.getId()), rs ->
+            dataHolder.setValue(Boolean.TRUE)
+        );
 
-        if (!dataHolder.getValue()) {
+        if (Boolean.FALSE.equals(dataHolder.getValue())) {
             throw new EntityNotFoundException("Entity with id " + id.toString() + " not found");
         }
 
@@ -116,7 +124,7 @@ public class JdbcLocationRepository implements LocationRepository {
             .toList();
 
         MapSqlParameterSource mapSqlParameterSource = createLocationMapSqlParameterSource(location);
-        mapSqlParameterSource.addValue("location_id", id.getId());
+        mapSqlParameterSource.addValue(LOCATION_ID_EXPRESSION, id.getId());
         namedParameterJdbcTemplate.update(QUERY_UPDATE_LOCATION, mapSqlParameterSource);
 
         if (!tagsToInsert.isEmpty()) {
@@ -133,7 +141,7 @@ public class JdbcLocationRepository implements LocationRepository {
     @Override
     @Transactional
     public boolean delete(LocationId id) {
-        Map<String, Long> params = Map.of("location_id", id.getId());
+        Map<String, Long> params = Map.of(LOCATION_ID_EXPRESSION, id.getId());
 
         namedParameterJdbcTemplate.update(QUERY_DELETE_LOCATION_TAG_BY_LOCATION_ID, params);
         int affectedRows = namedParameterJdbcTemplate.update(QUERY_DELETE_LOCATION, params);
@@ -145,7 +153,7 @@ public class JdbcLocationRepository implements LocationRepository {
 
         List<String> tags = new ArrayList<>();
 
-        namedParameterJdbcTemplate.query(QUERY_LOCATION_TAGS_BY_ID, Map.of("location_id", locationId.getId()),
+        namedParameterJdbcTemplate.query(QUERY_LOCATION_TAGS_BY_ID, Map.of(LOCATION_ID_EXPRESSION, locationId.getId()),
             rs -> {
                 String tag = rs.getString("tag");
                 tags.add(tag);

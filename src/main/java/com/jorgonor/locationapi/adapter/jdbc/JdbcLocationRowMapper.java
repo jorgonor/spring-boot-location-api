@@ -14,8 +14,8 @@ public class JdbcLocationRowMapper implements RowMapper<Location.LocationBuilder
             .id(new LocationId(rs.getLong("id")))
             .name(rs.getString("name"))
             .description(rs.getString("description"))
-            .createdAt(rs.getTimestamp("created_at").toInstant())
-            .modifiedAt(rs.getTimestamp("modified_at").toInstant())
+            .createdAt(JdbcUtils.getInstantFromColumnLabel(rs, "created_at"))
+            .modifiedAt(JdbcUtils.getInstantFromColumnLabel(rs, "modified_at"))
             .latitude(rs.getDouble("latitude"))
             .longitude(rs.getDouble("longitude"));
     }
