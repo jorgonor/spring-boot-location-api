@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -104,7 +105,7 @@ public class JdbcLocationRepository implements LocationRepository {
     public Location update(LocationId id, Location location) {
         DataHolder<Boolean> dataHolder = new DataHolder<>(Boolean.FALSE);
 
-        namedParameterJdbcTemplate.query(QUERY_EXISTS_LOCATION, Map.of("id", id.getId()), rs ->
+        namedParameterJdbcTemplate.query(QUERY_EXISTS_LOCATION, Map.of("id", id.getId()), (RowCallbackHandler) rs ->
             dataHolder.setValue(Boolean.TRUE)
         );
 
