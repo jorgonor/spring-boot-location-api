@@ -5,6 +5,7 @@ import com.jorgonor.locationapi.domain.LocationId;
 import com.jorgonor.locationapi.domain.exception.EntityNotFoundException;
 import com.jorgonor.locationapi.domain.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
+@Profile("postgres")
 @RequiredArgsConstructor
 public class JdbcLocationRepository implements LocationRepository {
 

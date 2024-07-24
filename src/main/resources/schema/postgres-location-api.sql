@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS location;
+
 CREATE SEQUENCE location.location_id_seq;
 
 -- Table: location.location
@@ -18,8 +20,7 @@ CREATE TABLE IF NOT EXISTS location.location
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS location.location
-    OWNER to postgres;
+-- ALTER TABLE IF EXISTS location.location;
 
 -- Table: location.location_tag
 
@@ -39,8 +40,7 @@ CREATE TABLE IF NOT EXISTS location.location_tag
 
 TABLESPACE pg_default;
 
-ALTER TABLE IF EXISTS location.location_tag
-    OWNER to postgres;
+-- ALTER TABLE IF EXISTS location.location_tag;
 -- Index: fki_location_tag_location_fk
 
 -- DROP INDEX IF EXISTS location.fki_location_tag_location_fk;
