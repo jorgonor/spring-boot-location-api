@@ -1,4 +1,4 @@
-package com.jorgonor.locationapi.adapter.jdbc;
+package com.jorgonor.locationapi.infrastructure.persistence.jdbc;
 
 import lombok.Data;
 

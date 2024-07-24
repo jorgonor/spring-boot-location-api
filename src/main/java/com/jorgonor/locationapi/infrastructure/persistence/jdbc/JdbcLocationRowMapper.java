@@ -1,4 +1,4 @@
-package com.jorgonor.locationapi.adapter.jdbc;
+package com.jorgonor.locationapi.infrastructure.persistence.jdbc;
 
 import com.jorgonor.locationapi.domain.Location;
 import com.jorgonor.locationapi.domain.LocationId;
