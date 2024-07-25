@@ -1,11 +1,11 @@
 package com.jorgonor.locationapi.adapter.rest;
 
+import com.jorgonor.locationapi.adapter.rest.api.CreateOrUpdateLocationDTO;
 import com.jorgonor.locationapi.adapter.rest.api.LocationDTO;
 import com.jorgonor.locationapi.domain.Location;
-import com.jorgonor.locationapi.domain.LocationId;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component("restLocationMapper")
 public class LocationMapper {
 
     LocationDTO map(Location location) {
@@ -21,19 +21,11 @@ public class LocationMapper {
             .build();
     }
 
-    Location from(LocationDTO locationDTO) {
+    Location from(CreateOrUpdateLocationDTO locationDTO) {
         Location.LocationBuilder locationBuilder = Location.builder();
-
-        Long locationId = locationDTO.getId();
-
-        if (locationId != null) {
-            locationBuilder.id(new LocationId(locationId));
-        }
 
         locationBuilder.name(locationDTO.getName())
             .description(locationDTO.getDescription())
-            .createdAt(locationDTO.getCreatedAt())
-            .modifiedAt(locationDTO.getModifiedAt())
             .longitude(locationDTO.getLongitude())
             .latitude(locationDTO.getLatitude());
 

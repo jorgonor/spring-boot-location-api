@@ -1,6 +1,7 @@
 package com.jorgonor.locationapi.adapter.rest;
 
 
+import com.jorgonor.locationapi.adapter.rest.api.CreateOrUpdateLocationDTO;
 import com.jorgonor.locationapi.adapter.rest.api.LocationDTO;
 import com.jorgonor.locationapi.domain.Location;
 import com.jorgonor.locationapi.domain.LocationId;
@@ -30,7 +31,7 @@ public class LocationController {
     }
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LocationDTO> post(@RequestBody LocationDTO newLocationDTO) {
+    public ResponseEntity<LocationDTO> post(@RequestBody CreateOrUpdateLocationDTO newLocationDTO) {
         Location newLocation = locationMapper.from(newLocationDTO);
         Location savedLocation = locationRepository.save(newLocation);
 
@@ -38,8 +39,7 @@ public class LocationController {
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LocationDTO> put(@PathVariable long id, @RequestBody LocationDTO updatedLocationDTO) {
-
+    public ResponseEntity<LocationDTO> put(@PathVariable long id, @RequestBody CreateOrUpdateLocationDTO updatedLocationDTO) {
         Location updatedLocation = locationMapper.from(updatedLocationDTO);
         Location savedLocation = locationRepository.update(new LocationId(id), updatedLocation);
 

@@ -1,0 +1,27 @@
+version: '3.8'
+
+networks:
+  location-api:
+    driver: bridge
+
+services:
+  mongodb:
+    image: mongo:6.0.16
+    ports:
+      - '27017:27017'
+    volumes:
+      - ./volumes/mongo:/data/db
+    networks:
+      - location-api
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - "POSTGRES_DB=postgres"
+      - "POSTGRES_USER=postgres"
+      - "POSTGRES_PASSWORD=postgres"
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+    networks:
+      - location-api

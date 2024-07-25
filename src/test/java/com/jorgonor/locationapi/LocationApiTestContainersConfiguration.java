@@ -20,7 +20,7 @@ public class LocationApiTestContainersConfiguration {
     @ServiceConnection
     PostgreSQLContainer<?> pgvectorContainer() {
         LOG.info("Starting postgres test container.");
-        return new PostgreSQLContainer<>(DockerImageName.parse("pgvector/pgvector:pg16"))
+        return new PostgreSQLContainer<>(DockerImageName.parse("postgres:16-alpine"))
             .withUrlParam("currentSchema", "location")
             .withUrlParam("binaryTransfer", "true")
             .withUrlParam("rewriteBatchedInserts", "true");
@@ -31,7 +31,7 @@ public class LocationApiTestContainersConfiguration {
     @ServiceConnection
     MongoDBContainer mongoContainer() {
         LOG.info("Starting mongo test container.");
-        return new MongoDBContainer("mongo:4.0.10");
+        return new MongoDBContainer("mongo:6.0.16");
     }
 
 }

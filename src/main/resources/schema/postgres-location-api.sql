@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS location;
 
-CREATE SEQUENCE location.location_id_seq;
+CREATE SEQUENCE IF NOT EXISTS location.location_id_seq;
 
 -- Table: location.location
 
